@@ -93,8 +93,7 @@ sub mir {
 }
 
 # Calculates the "systematic error" for two subregions 
-# usage: systematic_error()
-# note: not quite sure what N is supposed to be; guessed
+# usage, where N is the sample size: systematic_error(N)
 sub systematic_error {
     my $self = shift;
     my $m1 = scalar(keys %{$self->{"region_1"}}); #number of distinct haplotypes in region 1
@@ -107,7 +106,7 @@ sub systematic_error {
 
 # T statistic
 # Null hypo: two regions are in linkage equilibrium
-# note: not quite sure what N is
+# usage, where N is the sample size: t_statistic(N)
 sub t_statistic {
     my $self = shift;
     my $N = shift;
