@@ -9,11 +9,12 @@ my $parser = Linkage::parser->new(
 );
 
 my $data = Linkage::multiMI->new(
-    region_1 => {$parser -> openRegion1("region1.snp")},
-    region_2 => {$parser -> openRegion2("region2.snp")},
-    joint_haplotypes => {$parser -> openJointRegion("joint_region.snp")}
+    region_1 => {$parser -> setRegion1(0, 10)},
+    region_2 => {$parser -> setRegion2(10, 10)},
+    joint_haplotypes => {$parser -> setJointRegion(0, 10, 10)}
 );
 
+print "snp length: " , $parser -> snpLength(), "\n";
 print "Entropy at 1: ", $data -> entropy("region_1"), "\n"; # entropy at locus 1
 print "Entropy at 2: ", $data -> entropy("region_2"), "\n"; # entropy at locus 2
 print "Mutual information: ", $data -> mutual_information(), "\n";
