@@ -40,8 +40,12 @@ for (my $i = 0; $i < $tot_region_length + 1 - $window_size; $i++) {
     }
 }
 
-open(RFILE, ">$ARGV[1]") || die "can't open file $!";
-print RFILE '"Window_size","Distance", "MIR"', "\n";
+open(RFILE, "+>>$ARGV[1]") || die "can't open file $!";
+seek(RFILE, 0, 0);
+if (<RFILE> !~ m/^\"Window/) {
+    print RFILE '"Window_size","Distance", "MIR"', "\n"; 
+}
+seek(RFILE, 0, 2);
 for my $distance (keys %total_mir) {
     print RFILE "$window_size,$distance,", $total_mir{$distance} / $count_mir{$distance}, " \n";
 }
