@@ -20,19 +20,13 @@ sub setRegion1 {
     open(DATA, $self->{"snp_location"}) || die "can't open file: $!";
     my %r1_uniques;
     my $line;
-    my $found_hap;
     while (<DATA>) {
         chomp;
         $line = substr($_, $starting_position, $window_size);
-        $found_hap = 0; 
-        foreach my $haplotype (keys %r1_uniques) {
-            if ($haplotype =~ m/$line/) {
-                $r1_uniques{$haplotype}++;
-                $found_hap = 1;
-                last;
-            }
+        if (exists $r1_uniques{$line}) {
+            $r1_uniques{$line}++;
         }
-        if ($found_hap == 0) {
+        else {
             $r1_uniques{$line} = 1;
         }
     }
@@ -52,19 +46,13 @@ sub setRegion2 {
     open(DATA, $self->{"snp_location"}) || die "can't open file: $!";
     my %r2_uniques;
     my $line;
-    my $found_hap;
     while (<DATA>) {
         chomp;
         $line = substr($_, $starting_position, $window_size);
-        $found_hap = 0; 
-        foreach my $haplotype (keys %r2_uniques) {
-            if ($haplotype =~ m/$line/) {
-                $r2_uniques{$haplotype}++;
-                $found_hap = 1;
-            last;
+        if (exists $r2_uniques{$line}) {
+            $r2_uniques{$line}++;
         }
-        }
-        if ($found_hap == 0) {
+        else {
             $r2_uniques{$line} = 1;
         }
     }
@@ -86,20 +74,14 @@ sub setJointRegion {
     open(DATA, $self->{"snp_location"}) || die "can't open file: $!";
     my %unique_haplotypes;
     my $line;
-    my $found_hap;
     while (<DATA>) {
         chomp;
         $line = substr($_, $region_1_starting_position, $window_size) . 
             substr($_, $region_2_starting_position, $window_size);
-        $found_hap = 0; 
-        foreach my $haplotype (keys %unique_haplotypes) {
-            if ($haplotype =~ m/$line/) {
-                $unique_haplotypes{$haplotype}++;
-                $found_hap = 1;
-                last;
-            }
+        if (exists $unique_haplotypes{$line}) {
+            $unique_haplotypes{$line}++;
         }
-        if ($found_hap == 0) {
+        else {
             $unique_haplotypes{$line} = 1;
         }
     }
