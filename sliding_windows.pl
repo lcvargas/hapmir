@@ -1,11 +1,22 @@
 #!/opt/local/bin/perl -w 
 use strict;
 use Moose;
+use Getopt::Long;
 use Linkage::multiMI;
 use Linkage::parser;
 
+my $window_size;
+my $snp_location;
+my $outfile_location = "mir.out";
+die "Usage: ./sliding_windows.pl -w window_size -i infile.snp -o outfile.csv\n" if @ARGV != 6;
+GetOptions(
+    "window|w=i" => \$window_size,
+    "snp|i|infile=s" => \$snp_location,
+    "outfile|o=s" => \$outfile_location
+) or die "Usage: -w window_size -i infile.snp -o outfile.csv";
+
 my $parser = Linkage::parser->new(
-    snp_location => "joint_region.snp"
+    snp_location => $snp_location 
 );
 
 my $data = Linkage::multiMI->new(
@@ -14,21 +25,15 @@ my $data = Linkage::multiMI->new(
     joint_haplotypes => {}
 );
 
-die "Usage: ./sliding_windows.pl window_size outfile.csv\n" if @ARGV < 2;
-my $window_size = $ARGV[0];
 my $tot_region_length = $parser -> snpLength();
 my %total_mir;
 my %count_mir;
-print "|| Window size || Reg1 start || Reg2 start ||     MIR     ||     Error     || \n";
 for (my $i = 0; $i < $tot_region_length + 1 - $window_size; $i++) {
     for (my $j = 0; $j < $tot_region_length + 1 - $window_size; $j++) {
         $data -> {"region_1"} = {$parser -> setRegion1($i, $window_size)};
         $data -> {"region_2"} = {$parser -> setRegion2($j, $window_size)};
         $data -> {"joint_haplotypes"} = 
             {$parser -> setJointRegion($i, $j, $window_size)};
-        print "||     $window_size      ||     $i      ||     $j      ||  " , 
-            $data -> mir(), "     ||    ", 
-            $data -> systematic_error(1000), "     || \n";
         if (exists $total_mir{abs($i - $j)}) {
             $total_mir{abs($i - $j)} += $data -> mir();
             $count_mir{abs($i - $j)}++; 
@@ -40,14 +45,14 @@ for (my $i = 0; $i < $tot_region_length + 1 - $window_size; $i++) {
     }
 }
 
-open(RFILE, "+>>$ARGV[1]") || die "can't open file $!";
+open(RFILE, "+>>$outfile_location") || die "can't open output file $!";
 seek(RFILE, 0, 0);
-if (<RFILE> !~ m/^\"Window/) {
-    print RFILE '"Window_size","Distance", "MIR"', "\n"; 
+if (<RFILE> !~ m/^Window/) {
+    print RFILE "Window_size\tDistance\tMIR\n"; 
 }
 seek(RFILE, 0, 2);
 for my $distance (keys %total_mir) {
-    print RFILE "$window_size,$distance,", $total_mir{$distance} / $count_mir{$distance}, " \n";
+    print RFILE "$window_size\t$distance\t", $total_mir{$distance} / $count_mir{$distance}, " \n";
 }
 close RFILE;
 
