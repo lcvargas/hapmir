@@ -96,12 +96,17 @@ sub mir {
 # usage, where N is the sample size: systematic_error(N)
 sub systematic_error {
     my $self = shift;
+    my $N = shift;
     my $m1 = scalar(keys %{$self->{"region_1"}}); #number of distinct haplotypes in region 1
     my $m2 = scalar(keys %{$self->{"region_2"}}); #number of distinct haplotypes in region 2
     my $m12 = $m1*$m2; #num distinct haplotypes in joint region
 
-    my $N = shift;
-    return sprintf "%.4f", ($m12 - $m1 - $m2 + 1)/(2*$N);
+    my @entropies;
+    push(@entropies, $self -> entropy("region_1"));
+    push(@entropies, $self -> entropy("region_2"));
+    my @sorted = sort {$a <=> $b} (@entropies); # sort numerically
+    my $min = shift(@sorted); 
+    return sprintf "%.4f", (($m12 - $m1 - $m2 + 1)/(2*$N))/$min;
 }
 
 # T statistic
