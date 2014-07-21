@@ -6,10 +6,12 @@ use Linkage::parser;
 my $window_size = 10;
 my $snp_location = "snp.in";
 my $outfile_location = "mir.out";
+my $is_ldhat_file;
 GetOptions(
     "window|w=i" => \$window_size,
     "snp|i|infile=s" => \$snp_location,
-    "outfile|o=s" => \$outfile_location
+    "outfile|o=s" => \$outfile_location,
+    "ldhat|hat" => \$is_ldhat_file
 ) or die "Usage: -w window_size -i snp.in -o mir.out";
 die "Usage: ./sliding_windows.pl -w window_size -i snp.in -o mir.out\n" if @ARGV != 0;
 
@@ -24,10 +26,11 @@ my $data = Linkage::multiMI->new(
     joint_haplotypes => {} # hash with haplotype => frequency for joint region
 );
 
-my $tot_region_length = $parser -> snpLength();
 my $sample_size = $parser -> parse(); # read data into memory and 
                                     # return the number of lines in file
 # print "$sample_size\n";
+my $tot_region_length = $parser -> snpLength();
+print "$tot_region_length\n";
 open(TABFILE, ">$outfile_location") || die "Can't open output file $!";
 print TABFILE "start_pos_1\tstart_pos_2\twindow_size\tmir\tsys_error\n";
 for (my $i = 0; $i < $tot_region_length + 1 - $window_size; $i+=$window_size) {
